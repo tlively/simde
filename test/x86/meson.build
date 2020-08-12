@@ -47,3 +47,19 @@ foreach name : simde_test_x86_tests
     endforeach
   endforeach
 endforeach
+
+simde_test_x86_compare_tests = [
+  'sse'
+]
+
+foreach name : simde_test_x86_compare_tests
+  x = executable(name + '-compare', name + '-compare.c',
+      c_args: simde_c_args + simde_c_defs + simde_native_c_flags + ['-DSIMDE_TEST_BARE', '-DSIMDE_NO_NATIVE'],
+      cpp_args: simde_c_args + simde_c_defs + simde_native_c_flags + ['-DSIMDE_TEST_BARE', '-DSIMDE_NO_NATIVE'],
+      include_directories: simde_include_dir,
+      dependencies: simde_deps)
+
+  test('x86/' + name + '/compare', x,
+      protocol: 'tap',
+      workdir: meson.current_build_dir())
+endforeach
