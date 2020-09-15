@@ -374,6 +374,130 @@ simde__m512d_to_private(simde__m512d v) {
   return r;
 }
 
+#define SIMDE_X86_AVX512_MASK_FUNCS_NATIVE_DECLARE_UNARY(Prefix, Family, Suffix, VectorType, MaskType) \
+  SIMDE_FUNCTION_ATTRIBUTES \
+  simde##VectorType \
+  simde##Prefix##mask_##Family##Suffix(simde##VectorType src, simde##MaskType k, simde##VectorType a) { \
+    return Prefix##mask_##Family##Suffix(src, k, a); \
+  } \
+  \
+  SIMDE_FUNCTION_ATTRIBUTES \
+  simde##VectorType \
+  simde##Prefix##maskz_##Family##Suffix(simde##MaskType k, simde##VectorType a) { \
+    return Prefix##maskz_##Family##Suffix(k, a); \
+  }
+
+#define SIMDE_X86_AVX512_MASK_FUNCS_EMUL_DECLARE_UNARY(Prefix, Family, Suffix, VectorType, MaskType) \
+  SIMDE_FUNCTION_ATTRIBUTES \
+  simde##VectorType \
+  simde##Prefix##mask_##Family##Suffix(simde##VectorType src, simde##MaskType k, simde##VectorType a) { \
+    return simde##Prefix##mask_mov##Suffix(src, k, simde##Prefix##Family##Suffix(a)); \
+  } \
+  \
+  SIMDE_FUNCTION_ATTRIBUTES \
+  simde##VectorType \
+  simde##Prefix##maskz_##Family##Suffix(simde##MaskType k, simde##VectorType a) { \
+    return simde##Prefix##maskz_mov##Suffix(k, simde##Prefix##Family##Suffix(a)); \
+  }
+
+#define SIMDE_X86_AVX512_MASK_FUNCS_NATIVE_DECLARE_BINARY(Prefix, Family, Suffix, VectorType, MaskType) \
+  SIMDE_FUNCTION_ATTRIBUTES \
+  simde##VectorType \
+  simde##Prefix##mask_##Family##Suffix(simde##VectorType src, simde##MaskType k, simde##VectorType a, simde##VectorType b) { \
+    return Prefix##mask_##Family##Suffix(src, k, a, b); \
+  } \
+  \
+  SIMDE_FUNCTION_ATTRIBUTES \
+  simde##VectorType \
+  simde##Prefix##maskz_##Family##Suffix(simde##MaskType k, simde##VectorType a, simde##VectorType b) { \
+    return Prefix##maskz_##Family##Suffix(k, a, b); \
+  }
+
+#define SIMDE_X86_AVX512_MASK_FUNCS_EMUL_DECLARE_BINARY(Prefix, Family, Suffix, VectorType, MaskType) \
+  SIMDE_FUNCTION_ATTRIBUTES \
+  simde##VectorType \
+  simde##Prefix##mask_##Family##Suffix(simde##VectorType src, simde##MaskType k, simde##VectorType a, simde##VectorType b) { \
+    return simde##Prefix##mask_mov##Suffix(src, k, simde##Prefix##Family##Suffix(a, b)); \
+  } \
+  \
+  SIMDE_FUNCTION_ATTRIBUTES \
+  simde##VectorType \
+  simde##Prefix##maskz_##Family##Suffix(simde##MaskType k, simde##VectorType a, simde##VectorType b) { \
+    return simde##Prefix##maskz_mov##Suffix(k, simde##Prefix##Family##Suffix(a, b)); \
+  }\
+
+#if defined(SIMDE_X86_AVX512F_NATIVE)
+  #define SIMDE_X86_AVX512F_MASK_FUNCS_DECLARE_UNARY(Prefix, Family, Suffix, VectorType, MaskType) \
+           SIMDE_X86_AVX512_MASK_FUNCS_NATIVE_DECLARE_UNARY(Prefix, Family, Suffix, VectorType, MaskType)
+  #define SIMDE_X86_AVX512F_MASK_FUNCS_DECLARE_BINARY(Prefix, Family, Suffix, VectorType, MaskType) \
+           SIMDE_X86_AVX512_MASK_FUNCS_NATIVE_DECLARE_BINARY(Prefix, Family, Suffix, VectorType, MaskType)
+#else
+  #define SIMDE_X86_AVX512F_MASK_FUNCS_DECLARE_UNARY(Prefix, Family, Suffix, VectorType, MaskType) \
+      SIMDE_X86_AVX512_MASK_FUNCS_EMUL_DECLARE_UNARY(Prefix, Family, Suffix, VectorType, MaskType)
+  #define SIMDE_X86_AVX512F_MASK_FUNCS_DECLARE_BINARY(Prefix, Family, Suffix, VectorType, MaskType) \
+      SIMDE_X86_AVX512_MASK_FUNCS_EMUL_DECLARE_BINARY(Prefix, Family, Suffix, VectorType, MaskType)
+#endif
+
+#if defined(SIMDE_X86_AVX512VL_NATIVE)
+  #define SIMDE_X86_AVX512VL_MASK_FUNCS_DECLARE_UNARY(Prefix, Family, Suffix, VectorType, MaskType) \
+           SIMDE_X86_AVX512_MASK_FUNCS_NATIVE_DECLARE_UNARY(Prefix, Family, Suffix, VectorType, MaskType)
+  #define SIMDE_X86_AVX512VL_MASK_FUNCS_DECLARE_BINARY(Prefix, Family, Suffix, VectorType, MaskType) \
+           SIMDE_X86_AVX512_MASK_FUNCS_NATIVE_DECLARE_BINARY(Prefix, Family, Suffix, VectorType, MaskType)
+#else
+  #define SIMDE_X86_AVX512VL_MASK_FUNCS_DECLARE_UNARY(Prefix, Family, Suffix, VectorType, MaskType) \
+      SIMDE_X86_AVX512_MASK_FUNCS_EMUL_DECLARE_UNARY(Prefix, Family, Suffix, VectorType, MaskType)
+  #define SIMDE_X86_AVX512VL_MASK_FUNCS_DECLARE_BINARY(Prefix, Family, Suffix, VectorType, MaskType) \
+      SIMDE_X86_AVX512_MASK_FUNCS_EMUL_DECLARE_BINARY(Prefix, Family, Suffix, VectorType, MaskType)
+#endif
+
+#if defined(SIMDE_X86_AVX512BW_NATIVE)
+  #define SIMDE_X86_AVX512BW_MASK_FUNCS_DECLARE_UNARY(Prefix, Family, Suffix, VectorType, MaskType) \
+           SIMDE_X86_AVX512_MASK_FUNCS_NATIVE_DECLARE_UNARY(Prefix, Family, Suffix, VectorType, MaskType)
+  #define SIMDE_X86_AVX512BW_MASK_FUNCS_DECLARE_BINARY(Prefix, Family, Suffix, VectorType, MaskType) \
+           SIMDE_X86_AVX512_MASK_FUNCS_NATIVE_DECLARE_BINARY(Prefix, Family, Suffix, VectorType, MaskType)
+#else
+  #define SIMDE_X86_AVX512BW_MASK_FUNCS_DECLARE_UNARY(Prefix, Family, Suffix, VectorType, MaskType) \
+      SIMDE_X86_AVX512_MASK_FUNCS_EMUL_DECLARE_UNARY(Prefix, Family, Suffix, VectorType, MaskType)
+  #define SIMDE_X86_AVX512BW_MASK_FUNCS_DECLARE_BINARY(Prefix, Family, Suffix, VectorType, MaskType) \
+      SIMDE_X86_AVX512_MASK_FUNCS_EMUL_DECLARE_BINARY(Prefix, Family, Suffix, VectorType, MaskType)
+#endif
+
+#if defined(SIMDE_X86_AVX512VLBW_NATIVE)
+  #define SIMDE_X86_AVX512VLBW_MASK_FUNCS_DECLARE_UNARY(Prefix, Family, Suffix, VectorType, MaskType) \
+           SIMDE_X86_AVX512_MASK_FUNCS_NATIVE_DECLARE_UNARY(Prefix, Family, Suffix, VectorType, MaskType)
+  #define SIMDE_X86_AVX512VLBW_MASK_FUNCS_DECLARE_BINARY(Prefix, Family, Suffix, VectorType, MaskType) \
+           SIMDE_X86_AVX512_MASK_FUNCS_NATIVE_DECLARE_BINARY(Prefix, Family, Suffix, VectorType, MaskType)
+#else
+  #define SIMDE_X86_AVX512VLBW_MASK_FUNCS_DECLARE_UNARY(Prefix, Family, Suffix, VectorType, MaskType) \
+      SIMDE_X86_AVX512_MASK_FUNCS_EMUL_DECLARE_UNARY(Prefix, Family, Suffix, VectorType, MaskType)
+  #define SIMDE_X86_AVX512VLBW_MASK_FUNCS_DECLARE_BINARY(Prefix, Family, Suffix, VectorType, MaskType) \
+      SIMDE_X86_AVX512_MASK_FUNCS_EMUL_DECLARE_BINARY(Prefix, Family, Suffix, VectorType, MaskType)
+#endif
+
+#if defined(SIMDE_X86_AVX512DQ_NATIVE)
+  #define SIMDE_X86_AVX512DQ_MASK_FUNCS_DECLARE_UNARY(Prefix, Family, Suffix, VectorType, MaskType) \
+           SIMDE_X86_AVX512_MASK_FUNCS_NATIVE_DECLARE_UNARY(Prefix, Family, Suffix, VectorType, MaskType)
+  #define SIMDE_X86_AVX512DQ_MASK_FUNCS_DECLARE_BINARY(Prefix, Family, Suffix, VectorType, MaskType) \
+           SIMDE_X86_AVX512_MASK_FUNCS_NATIVE_DECLARE_BINARY(Prefix, Family, Suffix, VectorType, MaskType)
+#else
+  #define SIMDE_X86_AVX512DQ_MASK_FUNCS_DECLARE_UNARY(Prefix, Family, Suffix, VectorType, MaskType) \
+      SIMDE_X86_AVX512_MASK_FUNCS_EMUL_DECLARE_UNARY(Prefix, Family, Suffix, VectorType, MaskType)
+  #define SIMDE_X86_AVX512DQ_MASK_FUNCS_DECLARE_BINARY(Prefix, Family, Suffix, VectorType, MaskType) \
+      SIMDE_X86_AVX512_MASK_FUNCS_EMUL_DECLARE_BINARY(Prefix, Family, Suffix, VectorType, MaskType)
+#endif
+
+#if defined(SIMDE_X86_AVX512VLDQ_NATIVE)
+  #define SIMDE_X86_AVX512VLDQ_MASK_FUNCS_DECLARE_UNARY(Prefix, Family, Suffix, VectorType, MaskType) \
+           SIMDE_X86_AVX512_MASK_FUNCS_NATIVE_DECLARE_UNARY(Prefix, Family, Suffix, VectorType, MaskType)
+  #define SIMDE_X86_AVX512VLDQ_MASK_FUNCS_DECLARE_BINARY(Prefix, Family, Suffix, VectorType, MaskType) \
+           SIMDE_X86_AVX512_MASK_FUNCS_NATIVE_DECLARE_BINARY(Prefix, Family, Suffix, VectorType, MaskType)
+#else
+  #define SIMDE_X86_AVX512VLDQ_MASK_FUNCS_DECLARE_UNARY(Prefix, Family, Suffix, VectorType, MaskType) \
+      SIMDE_X86_AVX512_MASK_FUNCS_EMUL_DECLARE_UNARY(Prefix, Family, Suffix, VectorType, MaskType)
+  #define SIMDE_X86_AVX512VLDQ_MASK_FUNCS_DECLARE_BINARY(Prefix, Family, Suffix, VectorType, MaskType) \
+      SIMDE_X86_AVX512_MASK_FUNCS_EMUL_DECLARE_BINARY(Prefix, Family, Suffix, VectorType, MaskType)
+#endif
+
 SIMDE_END_DECLS_
 HEDLEY_DIAGNOSTIC_POP
 
